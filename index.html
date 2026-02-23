@@ -214,33 +214,29 @@ function submitDonation() {
       return;
     }
 
-    // If name is unique, push donation
-    db.ref('donations').push({ name, amount: Number(amount) });
-    message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
-    message.className = "success";
-
-    document.getElementById('name').value = '';
-    document.getElementById('amount').value = '';
-  });
-}
-
-  // Check for duplicate names
-  db.ref('donations').orderByChild('name').equalTo(name).once('value', snapshot => {
-    if (snapshot.exists()) {
-      message.textContent = "This name has already been used.";
-      message.className = "error";
-      return;
+db.ref('donations').once('value').then(snapshot => {
+  let duplicate = false;
+  snapshot.forEach(child => {
+    const val = child.val();
+    if (val.name && val.name.toLowerCase() === name.toLowerCase()) {
+      duplicate = true;
     }
-
-    // If name is unique, push donation
-    db.ref('donations').push({ name, amount: Number(amount) });
-    message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
-    message.className = "success";
-
-    document.getElementById('name').value = '';
-    document.getElementById('amount').value = '';
   });
-}
+
+  if (duplicate) {
+    message.textContent = "This name has already been used.";
+    message.className = "error";
+    return;
+  }
+
+  // Push only if name is unique
+  db.ref('donations').push({ name, amount: Number(amount) });
+  message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
+  message.className = "success";
+
+  document.getElementById('name').value = '';
+  document.getElementById('amount').value = '';
+});
 
 function renderDonors(snapshot) {
   const list = document.getElementById('donorList');
@@ -290,6 +286,7 @@ window.submitDonation = submitDonation;
 </script>
 </body>
 </html>
+
 
 
 
