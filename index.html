@@ -125,7 +125,7 @@
   </div>
   <div class="container">
     <input id="name" placeholder="Your Name">
-    <input id="amount" placeholder="Minimum $50" type="number" min="50" step="1">
+    <input id="amount" placeholder="Amount in USD" type="number" min="50" step="1">
    <button onclick="submitDonation()">Donate</button>
    <div id="message"></div>
 
@@ -152,66 +152,52 @@
 
   // Submit donation
 function submitDonation() {
-  const nameInput = document.getElementById('name').value.trim();
+  const name = document.getElementById('name').value.trim();
   const amountInput = document.getElementById('amount').value.trim();
   const message = document.getElementById('message');
 
   message.className = "";
   message.textContent = "";
 
-  if (!nameInput) {
+  if (!name) {
     message.textContent = "Please enter your name.";
     message.className = "error";
     return;
   }
 
-  const amount = parseFloat(amountInput);
-  if (isNaN(amount)) {
+
+  if (!amountInput) {
+    message.textContent = "Please enter a number.";
+    message.className = "error";
+    return;
+  }
+  if (!/^\d+(\.\d+)?$/.test(amountInput)) {
     message.textContent = "Numbers only please.";
     message.className = "error";
     return;
   }
 
+  const amount = parseFloat(amountInput);
+
   if (amount < 50) {
-    message.textContent = "Only $50 and above allowed!";
+    message.textContent = "Only $50 and above allowed, please!";
     message.className = "error";
     return;
   }
 
-  if (amount > 20000 && nameInput !== "Ali Dirani") {
+  if (amount > 20000 && name !== "Ali Dirani") {
     message.textContent = "Only admins can donate more than 20,000 USD.";
     message.className = "error";
     return;
   }
 
-  // Check for duplicate name
-  db.ref('donations').orderByChild('name').equalTo(nameInput).once('value', function(snapshot) {
-    if (snapshot.exists()) {
-      message.textContent = `You have already donated, ${nameInput}!`;
-      message.className = "error";
-      return;
-    }
-    db.ref('donations').push({ name: nameInput, amount: amount });
-    message.textContent = `Thank you, ${nameInput}, for your donation!`;
-    message.className = "success";
-    document.getElementById('name').value = '';
-    document.getElementById('amount').value = '';
-  });
-}
+  db.ref('donations').push({ name, amount: Number(amount) });
 
-  // Check if this name already donated
-  db.ref('donations').orderByChild('name').equalTo(name).once('value', function(snapshot) {
-    if (snapshot.exists()) {
-      message.textContent = `You have already donated, ${name}!`;
-      message.className = "error";
-      return;
-    }
-    db.ref('donations').push({ name, amount: Number(amount) });
-    message.textContent = `Thank you, ${name}, for your donation!`;
-    message.className = "success";
-    document.getElementById('name').value = '';
-    document.getElementById('amount').value = '';
-  });
+  message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
+  message.className = "success";
+
+  document.getElementById('name').value = '';
+  document.getElementById('amount').value = '';
 }
 
   // Load donors
@@ -233,4 +219,3 @@ function submitDonation() {
 </body>
 
 </html>
-
