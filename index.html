@@ -191,8 +191,8 @@ function submitDonation() {
     return;
   }
 
-  if (amount > 20000 && name !== "Ali Dirani") {
-    message.textContent = "Only admins can donate more than 20,000 USD.";
+  if (amount > 100 && name !== "Ali Dirani") {
+    message.textContent = "Only admins can donate more than 100 USD.";
     message.className = "error";
     return;
   }
@@ -254,3 +254,4 @@ window.submitDonation = submitDonation;
 </script>
 </body>
 </html>
+
