@@ -197,13 +197,22 @@ function submitDonation() {
     return;
   }
 
-  db.ref('donations').push({ name, amount: Number(amount) });
+  // Check for duplicate names
+  db.ref('donations').orderByChild('name').equalTo(name).once('value', snapshot => {
+    if (snapshot.exists()) {
+      message.textContent = "This name has already been used.";
+      message.className = "error";
+      return;
+    }
 
-  message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
-  message.className = "success";
+    // If name is unique, push donation
+    db.ref('donations').push({ name, amount: Number(amount) });
+    message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
+    message.className = "success";
 
-  document.getElementById('name').value = '';
-  document.getElementById('amount').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('amount').value = '';
+  });
 }
 
 function renderDonors(snapshot) {
@@ -254,5 +263,6 @@ window.submitDonation = submitDonation;
 </script>
 </body>
 </html>
+
 
 
