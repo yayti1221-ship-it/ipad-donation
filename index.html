@@ -185,13 +185,19 @@ function submitDonation() {
     return;
   }
 
-  db.ref('donations').push({ name, amount: Number(amount) });
-
-  message.textContent = `Thank you, ${name}, for your donation!`;
-  message.className = "success";
-
-  document.getElementById('name').value = '';
-  document.getElementById('amount').value = '';
+  // Check if this name already donated
+  db.ref('donations').orderByChild('name').equalTo(name).once('value', function(snapshot) {
+    if (snapshot.exists()) {
+      message.textContent = `You have already donated, ${name}!`;
+      message.className = "error";
+      return;
+    }
+    db.ref('donations').push({ name, amount: Number(amount) });
+    message.textContent = `Thank you, ${name}, for your donation!`;
+    message.className = "success";
+    document.getElementById('name').value = '';
+    document.getElementById('amount').value = '';
+  });
 }
 
   // Load donors
