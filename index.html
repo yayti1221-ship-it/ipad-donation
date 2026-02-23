@@ -152,38 +152,52 @@
 
   // Submit donation
 function submitDonation() {
-  const name = document.getElementById('name').value.trim();
+  const nameInput = document.getElementById('name').value.trim();
   const amountInput = document.getElementById('amount').value.trim();
   const message = document.getElementById('message');
 
   message.className = "";
   message.textContent = "";
 
-  if (!name) {
+  if (!nameInput) {
     message.textContent = "Please enter your name.";
     message.className = "error";
     return;
   }
 
-  if (!/^\d+(\.\d+)?$/.test(amountInput)) {
+  const amount = parseFloat(amountInput);
+  if (isNaN(amount)) {
     message.textContent = "Numbers only please.";
     message.className = "error";
     return;
   }
 
-  const amount = parseFloat(amountInput);
-
   if (amount < 50) {
-    message.textContent = "Only $50 and above allowed, please !";
+    message.textContent = "Only $50 and above allowed!";
     message.className = "error";
     return;
   }
 
-  if (amount > 20000 && name !== "Ali Dirani") {
+  if (amount > 20000 && nameInput !== "Ali Dirani") {
     message.textContent = "Only admins can donate more than 20,000 USD.";
     message.className = "error";
     return;
   }
+
+  // Check for duplicate name
+  db.ref('donations').orderByChild('name').equalTo(nameInput).once('value', function(snapshot) {
+    if (snapshot.exists()) {
+      message.textContent = `You have already donated, ${nameInput}!`;
+      message.className = "error";
+      return;
+    }
+    db.ref('donations').push({ name: nameInput, amount: amount });
+    message.textContent = `Thank you, ${nameInput}, for your donation!`;
+    message.className = "success";
+    document.getElementById('name').value = '';
+    document.getElementById('amount').value = '';
+  });
+}
 
   // Check if this name already donated
   db.ref('donations').orderByChild('name').equalTo(name).once('value', function(snapshot) {
@@ -219,3 +233,4 @@ function submitDonation() {
 </body>
 
 </html>
+
