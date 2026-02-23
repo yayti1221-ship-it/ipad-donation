@@ -179,8 +179,13 @@ function submitDonation() {
     return;
   }
 
-  db.ref('donations').push({ name, amount });
+  if (amount > 20000 && name !== "Ali Dirani") {
+    message.textContent = "Only admins can donate more than 20,000 USD.";
+    message.className = "error";
+    return;
+  }
 
+  db.ref('donations').push({ name, amount });
 
   message.textContent = `Thank you, ${name}, for your donation!`;
   message.className = "success";
