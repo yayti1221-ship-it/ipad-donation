@@ -83,7 +83,7 @@
   <h1>iPad Donation Tracker</h1>
   <div class="container">
     <input id="name" placeholder="Your Name">
-    <input id="amount" placeholder="Amount" type="number">
+    <input id="amount" placeholder="Minimum $50" type="number" min="50" step="1">
     <button onclick="submitDonation()">Donate</button>
 
     <h2>Donors:</h2>
@@ -108,15 +108,32 @@
   const db = firebase.database();
 
   // Submit donation
-  function submitDonation() {
-    const name = document.getElementById('name').value.trim();
-    const amount = parseFloat(document.getElementById('amount').value);
-    if(name && !isNaN(amount) && amount > 0) {
-      db.ref('donations').push({ name, amount });
-      document.getElementById('name').value = '';
-      document.getElementById('amount').value = '';
-    }
+function submitDonation() {
+  const name = document.getElementById('name').value.trim();
+  const amountInput = document.getElementById('amount').value.trim();
+
+  if (!name) {
+    alert("Please enter your name.");
+    return;
   }
+
+  if (!/^\d+(\.\d+)?$/.test(amountInput)) {
+    alert("Amount must be numbers only.");
+    return;
+  }
+
+  const amount = parseFloat(amountInput);
+
+  if (amount < 50) {
+    alert("Please only $50 and above allowed.");
+    return;
+  }
+
+  db.ref('donations').push({ name, amount });
+
+  document.getElementById('name').value = '';
+  document.getElementById('amount').value = '';
+}
 
   // Load donors
   db.ref('donations').on('value', snapshot => {
@@ -135,4 +152,5 @@
   });
 </script>
 </body>
+
 </html>
