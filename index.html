@@ -215,6 +215,9 @@ function submitDonation() {
     });
     totalEl.textContent = total.toFixed(2);
   });
+
+// Expose to global scope for button onclick
+window.submitDonation = submitDonation;
 </script>
 </body>
 
