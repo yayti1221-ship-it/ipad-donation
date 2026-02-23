@@ -135,22 +135,22 @@
     <div class="total">Total Raised: $<span id="totalAmount">0</span></div>
   </div>
 
+</body>
 <script>
-  // 🔹 Paste your Firebase config here
- const firebaseConfig = {
+// 🔹 Paste your Firebase config here
+const firebaseConfig = {
   apiKey: "AIzaSyCYUn-Jtn3fn-FQ9PRn_-9DmbGNDqM20kM",
   authDomain: "ipad-donation-db.firebaseapp.com",
   databaseURL: "https://ipad-donation-db-default-rtdb.firebaseio.com",
   projectId: "ipad-donation-db",
-  storageBucket: "ipad-donation-db.firebasestorage.app",
+  storageBucket: "ipad-donation-db-default-rtdb.appspot.com",
   messagingSenderId: "799475714157",
   appId: "1:799475714157:web:7739a88ed8b20c09a31764"
 };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  // Submit donation
 function submitDonation() {
   const name = document.getElementById('name').value.trim();
   const amountInput = document.getElementById('amount').value.trim();
@@ -164,7 +164,6 @@ function submitDonation() {
     message.className = "error";
     return;
   }
-
 
   if (!amountInput) {
     message.textContent = "Please enter a number.";
@@ -200,25 +199,24 @@ function submitDonation() {
   document.getElementById('amount').value = '';
 }
 
-  // Load donors
-  db.ref('donations').on('value', snapshot => {
-    const list = document.getElementById('donorList');
-    const totalEl = document.getElementById('totalAmount');
-    let total = 0;
-    list.innerHTML = '';
-    snapshot.forEach(child => {
-      const val = child.val();
-      total += parseFloat(val.amount);
-      const li = document.createElement('li');
-      li.textContent = `${val.name} will donate $${val.amount}`;
-      list.appendChild(li);
-    });
-    totalEl.textContent = total.toFixed(2);
+db.ref('donations').on('value', snapshot => {
+  const list = document.getElementById('donorList');
+  const totalEl = document.getElementById('totalAmount');
+  let total = 0;
+  list.innerHTML = '';
+  snapshot.forEach(child => {
+    const val = child.val();
+    total += parseFloat(val.amount);
+    const li = document.createElement('li');
+    li.textContent = `${val.name} will donate $${val.amount}`;
+    list.appendChild(li);
   });
+  totalEl.textContent = total.toFixed(2);
+});
 
-// Expose to global scope for button onclick
 window.submitDonation = submitDonation;
 </script>
+</html>
 </body>
 
 </html>
