@@ -177,6 +177,7 @@ function submitDonation() {
     message.className = "error";
     return;
   }
+
   if (!/^\d+(\.\d+)?$/.test(amountInput)) {
     message.textContent = "Numbers only please.";
     message.className = "error";
@@ -196,6 +197,32 @@ function submitDonation() {
     message.className = "error";
     return;
   }
+
+  // NEW: get all donations and check manually
+  db.ref('donations').once('value').then(snapshot => {
+    let duplicate = false;
+    snapshot.forEach(child => {
+      const val = child.val();
+      if (val.name && val.name.toLowerCase() === name.toLowerCase()) {
+        duplicate = true;
+      }
+    });
+
+    if (duplicate) {
+      message.textContent = "This name has already been used.";
+      message.className = "error";
+      return;
+    }
+
+    // If name is unique, push donation
+    db.ref('donations').push({ name, amount: Number(amount) });
+    message.textContent = `Thank you, ${name}, for your donation of $${amount}!`;
+    message.className = "success";
+
+    document.getElementById('name').value = '';
+    document.getElementById('amount').value = '';
+  });
+}
 
   // Check for duplicate names
   db.ref('donations').orderByChild('name').equalTo(name).once('value', snapshot => {
@@ -263,6 +290,7 @@ window.submitDonation = submitDonation;
 </script>
 </body>
 </html>
+
 
 
 
