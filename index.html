@@ -185,7 +185,7 @@ function submitDonation() {
     return;
   }
 
-  db.ref('donations').push({ name, amount });
+  db.ref('donations').push({ name, amount: Number(amount) });
 
   message.textContent = `Thank you, ${name}, for your donation!`;
   message.className = "success";
